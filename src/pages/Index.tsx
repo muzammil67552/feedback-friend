@@ -52,51 +52,65 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
-      <div className="container max-w-4xl mx-auto px-4">
-        <div className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Feedback Notes</h1>
-              <p className="text-gray-500 mt-1">
-                Capture and manage your feedback with AI assistance
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-green-300 to-blue-500">
+      {/* Navbar */}
+      <nav className="backdrop-blur-md bg-white/30 border-b border-white/10">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center h-16">
+            <span className="text-2xl font-bold text-white">Muzammil.io</span>
+          </div>
+        </div>
+      </nav>
+
+      <div className="py-12">
+        <div className="container max-w-4xl mx-auto px-4">
+          <div className="space-y-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-white">Feedback Notes</h1>
+                <p className="text-white/80 mt-1">
+                  Capture and manage your feedback with AI assistance
+                </p>
+              </div>
+              {!isAdding && !editingNote && (
+                <Button 
+                  onClick={() => setIsAdding(true)} 
+                  className="gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-white/20"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Note
+                </Button>
+              )}
             </div>
-            {!isAdding && !editingNote && (
-              <Button onClick={() => setIsAdding(true)} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Note
-              </Button>
+
+            {(isAdding || editingNote) && (
+              <NoteForm
+                initialNote={editingNote ?? undefined}
+                onSubmit={editingNote ? handleEditNote : handleAddNote}
+                onCancel={() => {
+                  setIsAdding(false);
+                  setEditingNote(null);
+                }}
+              />
+            )}
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {notes.map((note) => (
+                <NoteCard
+                  key={note.id}
+                  note={note}
+                  onEdit={setEditingNote}
+                  onDelete={handleDeleteNote}
+                />
+              ))}
+            </div>
+
+            {notes.length === 0 && !isAdding && (
+              <div className="text-center py-12">
+                <p className="text-white/80">No feedback notes yet. Add your first note!</p>
+              </div>
             )}
           </div>
-
-          {(isAdding || editingNote) && (
-            <NoteForm
-              initialNote={editingNote ?? undefined}
-              onSubmit={editingNote ? handleEditNote : handleAddNote}
-              onCancel={() => {
-                setIsAdding(false);
-                setEditingNote(null);
-              }}
-            />
-          )}
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            {notes.map((note) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                onEdit={setEditingNote}
-                onDelete={handleDeleteNote}
-              />
-            ))}
-          </div>
-
-          {notes.length === 0 && !isAdding && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No feedback notes yet. Add your first note!</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
