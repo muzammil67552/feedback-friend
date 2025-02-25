@@ -4,7 +4,7 @@ import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, LayoutDashboard } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
@@ -56,8 +56,18 @@ const Index = () => {
       {/* Navbar */}
       <nav className="backdrop-blur-md bg-white/30 border-b border-white/10">
         <div className="container mx-auto px-4">
-          <div className="flex items-center h-16">
+          <div className="flex items-center justify-between h-16">
             <span className="text-2xl font-bold text-white">Muzammil.io</span>
+            <div className="flex items-center gap-6">
+              <Button 
+                variant="ghost" 
+                className="text-white hover:bg-white/20 gap-2"
+                onClick={() => console.log("Dashboard clicked")}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
