@@ -4,8 +4,14 @@ import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard } from "lucide-react";
+import { Plus, LayoutDashboard, Save, Clock, Star, User } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Index = () => {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -59,14 +65,35 @@ const Index = () => {
           <div className="flex items-center justify-between h-16">
             <span className="text-2xl font-bold text-white">Muzammil.io</span>
             <div className="flex items-center gap-6">
-              <Button 
-                variant="ghost" 
-                className="text-white hover:bg-white/20 gap-2"
-                onClick={() => console.log("Dashboard clicked")}
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="text-white hover:bg-white/20 gap-2"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-40">
+                  <DropdownMenuItem>
+                    <Save className="mr-2 h-4 w-4" />
+                    <span>Save Notes</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Clock className="mr-2 h-4 w-4" />
+                    <span>Recent Notes</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Star className="mr-2 h-4 w-4" />
+                    <span>Most Rated</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Star Noters</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
