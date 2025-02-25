@@ -4,7 +4,7 @@ import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Save, Clock, Star, User } from "lucide-react";
+import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -63,7 +63,10 @@ const Index = () => {
       <nav className="backdrop-blur-md bg-white/30 border-b border-white/10">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <span className="text-2xl font-bold text-white">Muzammil.io</span>
+            <div className="flex items-center space-x-2">
+              <MessageSquare className="h-8 w-8 text-white animate-pulse" />
+              <span className="text-2xl font-bold text-white tracking-tight">Muzammil.io</span>
+            </div>
             <div className="flex items-center gap-6">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
