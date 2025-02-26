@@ -10,7 +10,7 @@ import { Wand2 } from "lucide-react";
 
 interface NoteFormProps {
   initialNote?: Note;
-  onSubmit: (note: Omit<Note, "id" | "timestamp">) => void;
+  onSubmit: (note: Omit<Note, "id" | "user_id" | "created_at">) => void;
   onCancel?: () => void;
 }
 

@@ -18,7 +18,7 @@ export const NoteCard = ({ note, onEdit, onDelete }: NoteCardProps) => {
         <div>
           <h3 className="font-semibold text-lg">{note.title}</h3>
           <p className="text-sm text-gray-500">
-            {formatDistanceToNow(note.timestamp, { addSuffix: true })}
+            {formatDistanceToNow(note.created_at, { addSuffix: true })}
           </p>
         </div>
         <div className="flex gap-2">

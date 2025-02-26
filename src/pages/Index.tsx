@@ -51,9 +51,20 @@ const Index = () => {
 
   const handleAddNote = async (noteData: Omit<Note, "id" | "user_id" | "created_at">) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to add notes.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('notes')
-        .insert([noteData])
+        .insert([{ ...noteData, user_id: user.id }])
         .select()
         .single();
 
