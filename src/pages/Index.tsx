@@ -4,7 +4,7 @@ import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare } from "lucide-react";
+import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare, Facebook, Youtube, Github, Linkedin, WhatsApp } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -58,7 +58,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-green-300 to-blue-500">
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-green-300 to-blue-500 flex flex-col">
       {/* Navbar */}
       <nav className="backdrop-blur-md bg-white/30 border-b border-white/10">
         <div className="container mx-auto px-4">
@@ -102,7 +102,7 @@ const Index = () => {
         </div>
       </nav>
 
-      <div className="py-12">
+      <div className="flex-1 py-12">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -153,6 +153,36 @@ const Index = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="backdrop-blur-md bg-white/30 border-t border-white/10 py-6">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="flex items-center space-x-2">
+              <MessageSquare className="h-6 w-6 text-white" />
+              <span className="text-lg font-semibold text-white">Muzammil.io</span>
+            </div>
+            <div className="flex space-x-6">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
+                <Facebook className="h-6 w-6" />
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
+                <Youtube className="h-6 w-6" />
+              </a>
+              <a href="https://wa.me/your-number" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
+                <WhatsApp className="h-6 w-6" />
+              </a>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
+                <Github className="h-6 w-6" />
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
+                <Linkedin className="h-6 w-6" />
+              </a>
+            </div>
+            <p className="text-white/60 text-sm">© 2024 Muzammil.io. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
