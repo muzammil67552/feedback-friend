@@ -4,5 +4,6 @@ export interface Note {
   title: string;
   description: string;
   rating: number;
-  timestamp: Date;
+  user_id: string;
+  created_at: Date;
 }

@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
@@ -17,44 +18,117 @@ const Index = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const handleAddNote = (noteData: Omit<Note, "id" | "timestamp">) => {
-    const newNote: Note = {
-      ...noteData,
-      id: Math.random().toString(36).substr(2, 9),
-      timestamp: new Date(),
-    };
-    setNotes([newNote, ...notes]);
-    setIsAdding(false);
-    toast({
-      title: "Note added",
-      description: "Your feedback note has been successfully added.",
-    });
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  const fetchNotes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setNotes(data.map(note => ({
+        ...note,
+        created_at: new Date(note.created_at)
+      })));
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch notes. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditNote = (noteData: Omit<Note, "id" | "timestamp">) => {
+  const handleAddNote = async (noteData: Omit<Note, "id" | "user_id" | "created_at">) => {
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .insert([noteData])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setNotes([{ ...data, created_at: new Date(data.created_at) }, ...notes]);
+      setIsAdding(false);
+      toast({
+        title: "Note added",
+        description: "Your feedback note has been successfully added.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to add note. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditNote = async (noteData: Omit<Note, "id" | "user_id" | "created_at">) => {
     if (!editingNote) return;
-    const updatedNotes = notes.map((note) =>
-      note.id === editingNote.id
-        ? { ...note, ...noteData }
-        : note
-    );
-    setNotes(updatedNotes);
-    setEditingNote(null);
-    toast({
-      title: "Note updated",
-      description: "Your feedback note has been successfully updated.",
-    });
+
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .update(noteData)
+        .eq('id', editingNote.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const updatedNotes = notes.map((note) =>
+        note.id === editingNote.id
+          ? { ...data, created_at: new Date(data.created_at) }
+          : note
+      );
+      setNotes(updatedNotes);
+      setEditingNote(null);
+      toast({
+        title: "Note updated",
+        description: "Your feedback note has been successfully updated.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to update note. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteNote = (id: string) => {
-    setNotes(notes.filter((note) => note.id !== id));
-    toast({
-      title: "Note deleted",
-      description: "Your feedback note has been removed.",
-      variant: "destructive",
-    });
+  const handleDeleteNote = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setNotes(notes.filter((note) => note.id !== id));
+      toast({
+        title: "Note deleted",
+        description: "Your feedback note has been removed.",
+        variant: "destructive",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to delete note. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSignOut = async () => {
@@ -163,9 +237,15 @@ const Index = () => {
               ))}
             </div>
 
-            {notes.length === 0 && !isAdding && (
+            {notes.length === 0 && !isAdding && !isLoading && (
               <div className="text-center py-12">
                 <p className="text-white/80">No feedback notes yet. Add your first note!</p>
+              </div>
+            )}
+
+            {isLoading && (
+              <div className="text-center py-12">
+                <p className="text-white/80">Loading notes...</p>
               </div>
             )}
           </div>
