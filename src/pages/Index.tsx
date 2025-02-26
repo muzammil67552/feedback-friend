@@ -3,8 +3,9 @@ import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare, Facebook, Youtube, Github, Linkedin } from "lucide-react";
+import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare, Facebook, Youtube, Github, Linkedin, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,9 +57,19 @@ const Index = () => {
     });
   };
 
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 via-green-300 to-blue-500 flex flex-col">
-      {/* Navbar */}
       <nav className="backdrop-blur-md bg-white/30 border-b border-white/10">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -96,6 +107,14 @@ const Index = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-white/20 gap-2"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
@@ -153,7 +172,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="backdrop-blur-md bg-white/30 border-t border-white/10 py-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center space-y-4">
