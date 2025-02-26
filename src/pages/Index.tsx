@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare, Facebook, Youtube, Github, Linkedin, WhatsApp } from "lucide-react";
+import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare, Facebook, Youtube, Github, Linkedin } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -168,9 +167,6 @@ const Index = () => {
               </a>
               <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
                 <Youtube className="h-6 w-6" />
-              </a>
-              <a href="https://wa.me/your-number" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
-                <WhatsApp className="h-6 w-6" />
               </a>
               <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
                 <Github className="h-6 w-6" />
