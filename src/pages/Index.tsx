@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Index = () => {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -20,11 +21,20 @@ const Index = () => {
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
+    fetchUserProfile();
     fetchNotes();
   }, [filter]);
+
+  const fetchUserProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUser(user);
+    }
+  };
 
   const fetchNotes = async () => {
     try {
@@ -181,6 +191,19 @@ const Index = () => {
               <span className="text-2xl font-bold text-white tracking-tight">Muzammil.io</span>
             </div>
             <div className="flex items-center gap-6">
+              {user && (
+                <div className="flex items-center gap-3">
+                  <Avatar className="border-2 border-white/20">
+                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} alt="User" />
+                    <AvatarFallback className="bg-white/10 text-white">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-white text-sm hidden sm:inline-block">
+                    Welcome, {user.email?.split('@')[0]}
+                  </span>
+                </div>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
@@ -285,27 +308,51 @@ const Index = () => {
         </div>
       </div>
 
-      <footer className="backdrop-blur-md bg-black/30 border-t border-white/10 py-6">
+      <footer className="backdrop-blur-md bg-black/30 border-t border-white/10 py-8">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="flex items-center space-x-2">
-              <MessageSquare className="h-6 w-6 text-white" />
-              <span className="text-lg font-semibold text-white">Muzammil.io</span>
+          <div className="flex flex-col md:flex-row md:justify-between items-center">
+            <div className="flex flex-col items-center md:items-start mb-6 md:mb-0">
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="h-6 w-6 text-white" />
+                <span className="text-xl font-bold text-white">Muzammil.io</span>
+              </div>
+              <p className="text-white/60 mt-2 text-sm max-w-md text-center md:text-left">
+                A simple and elegant platform for capturing and organizing your feedback and notes with AI assistance.
+              </p>
             </div>
-            <div className="flex space-x-6">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
-                <Facebook className="h-6 w-6" />
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+                className="flex flex-col items-center group">
+                <div className="p-3 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                  <Facebook className="h-6 w-6 text-white" />
+                </div>
+                <span className="mt-2 text-white/80 text-sm">Facebook</span>
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
-                <Youtube className="h-6 w-6" />
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
+                className="flex flex-col items-center group">
+                <div className="p-3 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                  <Youtube className="h-6 w-6 text-white" />
+                </div>
+                <span className="mt-2 text-white/80 text-sm">YouTube</span>
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
-                <Github className="h-6 w-6" />
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" 
+                className="flex flex-col items-center group">
+                <div className="p-3 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                  <Github className="h-6 w-6 text-white" />
+                </div>
+                <span className="mt-2 text-white/80 text-sm">GitHub</span>
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80 transition-colors">
-                <Linkedin className="h-6 w-6" />
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" 
+                className="flex flex-col items-center group">
+                <div className="p-3 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                  <Linkedin className="h-6 w-6 text-white" />
+                </div>
+                <span className="mt-2 text-white/80 text-sm">LinkedIn</span>
               </a>
             </div>
+          </div>
+          <div className="mt-8 pt-6 border-t border-white/10 text-center">
             <p className="text-white/60 text-sm">© 2024 Muzammil.io. All rights reserved.</p>
           </div>
         </div>

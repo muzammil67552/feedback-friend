@@ -13,10 +13,10 @@ interface NoteCardProps {
 
 export const NoteCard = ({ note, onEdit, onDelete }: NoteCardProps) => {
   return (
-    <Card className="p-6 space-y-4 animate-fade-in backdrop-blur-sm bg-white/90 hover:bg-white/95 transition-all duration-300">
+    <Card className="p-6 space-y-4 animate-fade-in backdrop-blur-sm bg-white/90 hover:bg-white/95 transition-all duration-300 note-card-hover">
       <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-semibold text-lg">{note.title}</h3>
+        <div className="max-w-[70%]">
+          <h3 className="font-semibold text-lg truncate">{note.title}</h3>
           <p className="text-sm text-gray-500">
             {formatDistanceToNow(note.created_at, { addSuffix: true })}
           </p>
@@ -36,7 +36,7 @@ export const NoteCard = ({ note, onEdit, onDelete }: NoteCardProps) => {
           </button>
         </div>
       </div>
-      <p className="text-gray-700">{note.description}</p>
+      <p className="text-gray-700 break-words overflow-hidden line-clamp-3">{note.description}</p>
       <StarRating rating={note.rating} readonly />
     </Card>
   );
