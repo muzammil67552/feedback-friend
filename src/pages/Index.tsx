@@ -4,7 +4,7 @@ import { Note } from "@/types/Note";
 import { NoteCard } from "@/components/NoteCard";
 import { NoteForm } from "@/components/NoteForm";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare, Facebook, Youtube, Github, Linkedin, LogOut } from "lucide-react";
+import { Plus, LayoutDashboard, Save, Clock, Star, User, MessageSquare, Facebook, Youtube, Github, Linkedin, LogOut, Menu, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -22,6 +22,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -168,6 +169,7 @@ const Index = () => {
       title: "Notes saved",
       description: "Your notes have been saved successfully.",
     });
+    setMobileMenuOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -179,6 +181,7 @@ const Index = () => {
         variant: "destructive",
       });
     }
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -190,7 +193,9 @@ const Index = () => {
               <MessageSquare className="h-8 w-8 text-white animate-pulse" />
               <span className="text-2xl font-bold text-white tracking-tight">Muzammil.io</span>
             </div>
-            <div className="flex items-center gap-6">
+            
+            {/* Desktop navigation */}
+            <div className="hidden md:flex items-center gap-6">
               {user && (
                 <div className="flex items-center gap-3">
                   <Avatar className="border-2 border-white/20">
@@ -199,7 +204,7 @@ const Index = () => {
                       {user.email?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-white text-sm hidden sm:inline-block">
+                  <span className="text-white text-sm">
                     Welcome, {user.email?.split('@')[0]}
                   </span>
                 </div>
@@ -242,7 +247,85 @@ const Index = () => {
                 Sign Out
               </Button>
             </div>
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/20"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
+          
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-black/50 backdrop-blur-lg p-4 rounded-b-lg animate-fade-in border-t border-white/10">
+              {user && (
+                <div className="flex items-center gap-3 mb-4 p-2">
+                  <Avatar className="border-2 border-white/20">
+                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} alt="User" />
+                    <AvatarFallback className="bg-white/10 text-white">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-white text-sm">
+                    Welcome, {user.email?.split('@')[0]}
+                  </span>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-white hover:bg-white/20 gap-2"
+                  onClick={() => setFilter('recent')}
+                >
+                  <Clock className="h-4 w-4" />
+                  Recent Notes
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-white hover:bg-white/20 gap-2"
+                  onClick={() => setFilter('top-rated')}
+                >
+                  <Star className="h-4 w-4" />
+                  Most Rated
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-white hover:bg-white/20 gap-2"
+                  onClick={() => setFilter(null)}
+                >
+                  <User className="h-4 w-4" />
+                  All Notes
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-white hover:bg-white/20 gap-2"
+                  onClick={handleSaveNotes}
+                >
+                  <Save className="h-4 w-4" />
+                  Save Notes
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-white hover:bg-white/20 gap-2"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
