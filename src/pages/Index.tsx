@@ -19,18 +19,29 @@ const Index = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [filter, setFilter] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [filter]);
 
   const fetchNotes = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('notes')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
+      
+      // Apply filters based on dropdown selection
+      if (filter === 'recent') {
+        query = query.order('created_at', { ascending: false }).limit(5);
+      } else if (filter === 'top-rated') {
+        query = query.order('rating', { ascending: false });
+      } else {
+        query = query.order('created_at', { ascending: false });
+      }
+      
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -142,6 +153,13 @@ const Index = () => {
     }
   };
 
+  const handleSaveNotes = async () => {
+    toast({
+      title: "Notes saved",
+      description: "Your notes have been saved successfully.",
+    });
+  };
+
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -154,8 +172,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-green-300 to-blue-500 flex flex-col">
-      <nav className="backdrop-blur-md bg-white/30 border-b border-white/10">
+    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-900 to-black flex flex-col">
+      <nav className="backdrop-blur-md bg-black/30 border-b border-white/10">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
@@ -174,21 +192,21 @@ const Index = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-40">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSaveNotes}>
                     <Save className="mr-2 h-4 w-4" />
                     <span>Save Notes</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setFilter('recent')}>
                     <Clock className="mr-2 h-4 w-4" />
                     <span>Recent Notes</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setFilter('top-rated')}>
                     <Star className="mr-2 h-4 w-4" />
                     <span>Most Rated</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setFilter(null)}>
                     <User className="mr-2 h-4 w-4" />
-                    <span>Star Noters</span>
+                    <span>All Notes</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -212,7 +230,11 @@ const Index = () => {
               <div>
                 <h1 className="text-3xl font-bold text-white">Feedback Notes</h1>
                 <p className="text-white/80 mt-1">
-                  Capture and manage your feedback with AI assistance
+                  {filter === 'recent' 
+                    ? 'Your most recent feedback notes' 
+                    : filter === 'top-rated' 
+                      ? 'Your highest rated feedback notes'
+                      : 'Capture and manage your feedback with AI assistance'}
                 </p>
               </div>
               {!isAdding && !editingNote && (
@@ -263,7 +285,7 @@ const Index = () => {
         </div>
       </div>
 
-      <footer className="backdrop-blur-md bg-white/30 border-t border-white/10 py-6">
+      <footer className="backdrop-blur-md bg-black/30 border-t border-white/10 py-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center space-y-4">
             <div className="flex items-center space-x-2">

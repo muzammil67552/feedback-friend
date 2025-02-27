@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,15 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/');
+      }
+    });
+  }, [navigate]);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -27,9 +36,11 @@ const Auth = () => {
         });
         if (error) throw error;
         toast({
-          title: "Check your email",
-          description: "We've sent you a verification link!",
+          title: "Account created",
+          description: "Your account has been created successfully. Please sign in.",
         });
+        // Switch to sign in mode after successful signup
+        setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -50,7 +61,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-green-300 to-blue-500 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-900 to-black flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-4">
@@ -66,7 +77,7 @@ const Auth = () => {
           </p>
         </div>
 
-        <div className="backdrop-blur-md bg-white/20 p-8 rounded-lg shadow-xl border border-white/10">
+        <div className="backdrop-blur-md bg-black/20 p-8 rounded-lg shadow-xl border border-white/10">
           <form onSubmit={handleAuth} className="space-y-6">
             <div>
               <Input
