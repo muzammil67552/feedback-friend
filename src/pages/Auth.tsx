@@ -63,8 +63,9 @@ const Auth = () => {
           return;
         }
         
-        // If no email confirmation required, try to sign in directly
-        try {
+        // If the user was created successfully and no email confirmation is required
+        if (data.user) {
+          // Auto-login the user after signup
           const { error: signInError } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -74,21 +75,17 @@ const Auth = () => {
             toast({
               title: "Account created",
               description: "Your account has been created. Please sign in manually.",
+              variant: "destructive",
             });
             setIsSignUp(false);
           } else {
+            // Direct navigation to home page after successful signup
             toast({
               title: "Welcome!",
               description: "Your account has been created and you're now signed in.",
             });
             navigate("/");
           }
-        } catch (signInError: any) {
-          toast({
-            title: "Sign in required",
-            description: "Account created. Please sign in with your credentials.",
-          });
-          setIsSignUp(false);
         }
       } else {
         // Regular sign in
