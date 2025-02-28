@@ -30,23 +30,55 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        // Sign up the user
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
+        
         if (error) throw error;
-        toast({
-          title: "Account created",
-          description: "Your account has been created successfully. Please sign in.",
+        
+        // If sign up was successful but email confirmation is required
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          toast({
+            title: "Email confirmation required",
+            description: "Please check your email to confirm your account before signing in.",
+          });
+          setIsSignUp(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        // If sign up was successful, directly attempt to log in (in case email confirmation is disabled)
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
         });
-        // Switch to sign in mode after successful signup
-        setIsSignUp(false);
+        
+        if (signInError) {
+          // If can't login automatically, just switch to login mode
+          toast({
+            title: "Account created",
+            description: "Your account has been created successfully. Please sign in.",
+          });
+          setIsSignUp(false);
+        } else {
+          // Successfully logged in after signup
+          toast({
+            title: "Welcome!",
+            description: "Your account has been created and you're now signed in.",
+          });
+          navigate("/");
+        }
       } else {
+        // Regular sign in
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+        
         if (error) throw error;
+        
         navigate("/");
       }
     } catch (error: any) {
