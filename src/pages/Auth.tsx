@@ -34,11 +34,14 @@ const Auth = () => {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: window.location.origin // Ensure the redirect URL is set correctly
+          }
         });
         
         if (error) throw error;
         
-        // If sign up was successful but email confirmation is required
+        // Handle email confirmation
         if (data.user && data.user.identities && data.user.identities.length === 0) {
           toast({
             title: "Email confirmation required",
@@ -49,39 +52,72 @@ const Auth = () => {
           return;
         }
         
-        // If sign up was successful, directly attempt to log in (in case email confirmation is disabled)
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (signInError) {
-          // If can't login automatically, just switch to login mode
+        // Check if email confirmation is required
+        if (data.user?.confirmation_sent_at) {
           toast({
-            title: "Account created",
-            description: "Your account has been created successfully. Please sign in.",
+            title: "Email confirmation sent",
+            description: "Please check your email to confirm your account before signing in.",
           });
           setIsSignUp(false);
-        } else {
-          // Successfully logged in after signup
-          toast({
-            title: "Welcome!",
-            description: "Your account has been created and you're now signed in.",
+          setIsLoading(false);
+          return;
+        }
+        
+        // If no email confirmation required, try to sign in directly
+        try {
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
           });
-          navigate("/");
+          
+          if (signInError) {
+            toast({
+              title: "Account created",
+              description: "Your account has been created. Please sign in manually.",
+            });
+            setIsSignUp(false);
+          } else {
+            toast({
+              title: "Welcome!",
+              description: "Your account has been created and you're now signed in.",
+            });
+            navigate("/");
+          }
+        } catch (signInError: any) {
+          toast({
+            title: "Sign in required",
+            description: "Account created. Please sign in with your credentials.",
+          });
+          setIsSignUp(false);
         }
       } else {
         // Regular sign in
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
-        if (error) throw error;
-        
-        navigate("/");
+        if (error) {
+          // Handle the specific error for unconfirmed emails
+          if (error.message.includes("Email not confirmed")) {
+            toast({
+              title: "Email not confirmed",
+              description: "Please check your inbox and confirm your email address before signing in.",
+              variant: "destructive",
+            });
+          } else {
+            throw error;
+          }
+        } else if (data.user) {
+          toast({
+            title: "Welcome back!",
+            description: "You've successfully signed in.",
+          });
+          navigate("/");
+        }
       }
     } catch (error: any) {
+      console.error("Authentication error:", error);
       toast({
         title: "Error",
         description: error.message,
@@ -129,6 +165,7 @@ const Auth = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="bg-white/50 border-white/20 text-white placeholder:text-white/50"
+                minLength={6}
               />
             </div>
             <Button
