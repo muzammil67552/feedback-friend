@@ -34,38 +34,33 @@ const Auth = () => {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            emailRedirectTo: window.location.origin // Ensure the redirect URL is set correctly
-          }
         });
         
         if (error) throw error;
         
-        // Handle email confirmation
+        // Handle email confirmation requirements
         if (data.user && data.user.identities && data.user.identities.length === 0) {
           toast({
             title: "Email confirmation required",
             description: "Please check your email to confirm your account before signing in.",
           });
-          setIsSignUp(false);
           setIsLoading(false);
           return;
         }
         
-        // Check if email confirmation is required
+        // Check if email confirmation is required by Supabase
         if (data.user?.confirmation_sent_at) {
           toast({
             title: "Email confirmation sent",
             description: "Please check your email to confirm your account before signing in.",
           });
-          setIsSignUp(false);
           setIsLoading(false);
           return;
         }
         
         // If the user was created successfully and no email confirmation is required
         if (data.user) {
-          // Auto-login the user after signup
+          // Sign in the user automatically after signup
           const { error: signInError } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -73,13 +68,12 @@ const Auth = () => {
           
           if (signInError) {
             toast({
-              title: "Account created",
-              description: "Your account has been created. Please sign in manually.",
+              title: "Error signing in",
+              description: "Account created but couldn't sign in automatically. Please try signing in manually.",
               variant: "destructive",
             });
-            setIsSignUp(false);
           } else {
-            // Direct navigation to home page after successful signup
+            // Navigate directly to home page after successful signup and auto-signin
             toast({
               title: "Welcome!",
               description: "Your account has been created and you're now signed in.",
